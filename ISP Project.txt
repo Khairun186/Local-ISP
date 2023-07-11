@@ -1,0 +1,310 @@
+ISP Core Router--------------------------
+
+en
+conf t
+int fa0/0
+ip add 192.168.1.1 255.255.255.0
+no sh
+
+ip dhcp pool net1
+default-router 192.168.1.1
+network 192.168.1.0 255.255.255.0
+dns-server 192.168.1.2
+ex
+ip dhcp excluded-address 192.168.1.0 192.168.1.10  
+
+
+zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+
+en
+conf t
+int se2/0
+ip add 192.168.2.1 255.255.255.0
+clock rate 64000
+no sh 
+ex
+
+
+
+ip dhcp pool compz
+default-router 192.168.3.1
+network 192.168.3.0 255.255.255.0
+dns-server 192.168.1.2
+ex
+
+router rip  
+version 2
+network 192.168.2.0
+network 192.168.1.0
+end
+
+
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+
+en
+conf t
+int se3/0
+ip add 192.168.4.1 255.255.255.0
+clock rate
+no sh
+ex
+ip dhcp pool compj1
+default-router 192.168.5.1
+network 192.168.5.0 255.255.255.0
+dns-server 192.168.1.2
+ex
+ip dhcp pool compj2
+default-router 192.168.6.1
+network 192.168.6.0 255.255.255.0
+dns-server 192.168.1.2
+ex
+router rip
+version 2
+network 192.168.4.0
+ex
+
+
+
+
+ccccccccccccccccccccccccccccccccccccccccccccc
+
+
+
+
+
+
+show ip route
+
+ISP Router Zulin-----------------------------
+
+en
+conf t
+hostname companyZulin
+int se2/0
+ip add 192.168.2.2 255.255.255.0
+no sh 
+ex
+
+int fa0/0
+ip add 192.168.3.1 255.255.255.0
+no sh
+
+
+conf t
+router rip
+version 2
+network 192.168.2.0
+network 192.168.3.0
+ex
+
+
+conf t
+int fa0/0
+ip helper
+ip helper-address 192.168.2.1
+end
+
+
+ISP Router Jeds--------------------------
+
+en
+conf t
+int fa0/0
+no sh
+ex
+
+int fa0/0.10
+ip add 192.168.5.1 255.255.255.0
+
+encapsulation dot1Q 10
+ip add 192.168.5.1 255.255.255.0
+
+int fa0/0.20
+encapsulation dot1Q 20
+ip add 192.168.6.1 255.255.255.0
+
+int se2/0
+ip add 192.168.4.2 255.255.255.0
+no sh
+
+router rip  
+version 2
+network 192.168.5.0
+network 192.168.6.0
+network 192.168.4.0
+ex
+
+int fa0/0.10
+ip helper address 192.168.4.1
+ex
+
+int fa0/0.20
+ip helper address 192.168.4.1
+end
+
+
+
+main Switch command^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+en
+conf t
+vlan 10
+name admin
+ex
+
+vlan 20
+name general
+ex
+
+int fa0/1
+switchport mode access
+switchport mode vlan 10
+ex
+
+int fa0/2
+switchport mode access
+switchport mode vlan 20
+ex
+
+int fa0/4
+switchport mode trunk
+do write
+ex
+
+SW1==================
+ 
+en 
+conf t
+vlan 10
+name admin
+ex
+
+int range fa0/1-3
+switchport mode access
+switchport mode vlan 10
+do write
+end
+
+sW2=============
+
+en
+conf t
+vlan 20
+name general
+ex
+
+int range fa0/1-3
+switchport mode access
+switchport mode vlan 20
+do write
+end
+
+
+
+
+
+ISP Router cubic-----------------------------
+
+en
+conf t
+int se3/0
+ip add 192.168.8.1 255.255.255.0
+clock rate 64000
+no sh
+
+int se2/0
+ip add 192.168.7.2 255.255.255.0
+no sh
+
+router rip
+ver 2
+network 192.168.8.0
+network 192.168.7.0
+
+Jeds router corresponding to cubic********************
+
+en 
+conf t
+int se3/0
+ip add 192.168.7.1 255.255.255.0
+clock rate 64000
+no sh
+
+router rip
+ver 2
+network 192.168.7.0
+end
+
+
+Cubic Company router%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+en 
+conf t
+int fa0/1.10
+encapsulation dot1Q 10
+ip add 192.168.9.1 255.255.255.0
+ip dhcp pool compc1
+default-router 192.168.9.1
+network 192.168.9.0 255.255.255.0
+dns-server 192.168.1.2
+ex
+
+int fa0/1.20
+encapsulation dot1Q 20
+ip add 192.168.10.1 255.255.255.0
+ip dhcp pool compc2
+default-router 192.168.10.1
+network 192.168.10.0 255.255.255.0
+dns-server 192.168.1.2
+ex
+
+int fa0/1.30
+encapsulation dot1Q 30
+ip add 192.168.11.1 255.255.255.0
+ip dhcp pool compc3
+default-router 192.168.11.1
+network 192.168.11.0 255.255.255.0
+dns-server 192.168.1.2
+ex
+
+int fa0/1 
+no sh
+
+int se2/0
+ip add 192.168.8.2 255.255.255.0
+ex
+router rip
+ver 2
+network 192.168.8.0
+network 192.168.10.0
+network 192.168.9.0
+network 192.168.11.0
+end
+
+int se2/0 
+no sh
+
+Switch^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+en
+conf t
+int fa0/1
+switchport mode trunk
+int fa0/4
+ex
+vlan 10
+vlan 20
+vlan 30
+int fa0/4
+switchport mode access
+switchport access vlan10
+int range fa0/2-3
+switchport mode access
+switchport access vlan20
+int fa0/23
+switchport mode access
+switchport access vlan30
+
+
+
